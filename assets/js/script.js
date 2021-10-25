@@ -8,9 +8,13 @@ function startQuiz() {
   // initialize the timer
   let timerEl = document.querySelector('#timer')
   let timerValue = 60
-  setInterval(() => {
+  let intervalId = setInterval(() => {
     timerValue--
     timerEl.textContent = timerValue
+    // if timer drops below 0, end the game
+    if (timerValue <= 0) {
+      endQuiz(intervalId)
+    }
   }, 1000)
 
   // remove quiz intro
@@ -33,10 +37,26 @@ function startQuiz() {
       let choiceEl = document.createElement('button')
       choiceEl.textContent = questions[i].choices[j]
       quizEl.appendChild(choiceEl)
+      if (choiceEl.textContent == questions[i].correctChoice) {
+        choiceEl.addEventListener('click', () => {
+          console.log('Correct choice clicked!')
+        })
+      } else {
+        choiceEl.addEventListener('click', () => {
+          console.log('Incorrect choice clicked!')
+          timerValue -= 5
+        })
+      }
     }
 
     mainEl.appendChild(quizEl)
   }
+}
+
+function endQuiz(intervalId) {
+  console.log('Game over!')
+  // stop the timer
+  clearInterval(intervalId)
 }
 
 const questions = [
@@ -50,5 +70,20 @@ const questions = [
       "JavaScript's default behavior of moving declarations to the top is called:",
     choices: ['Bubbling', 'Hoisting', 'Funneling', 'Lifting'],
     correctChoice: 'Hoisting',
+  },
+  {
+    question: 'Which element should contain our JavaScript?',
+    choices: ['<javascript>', '<js>', '<code>', '<script>'],
+    correctChoice: '<script>',
+  },
+  {
+    question: 'How would you access an element with the class name of btn?',
+    choices: [
+      "document.getElementById('btn')",
+      "document.getElementByClassName('btn')",
+      "document.querySelector('.btn')",
+      "document.querySelector('#btn')",
+    ],
+    correctChoice: "document.querySelector('.btn')",
   },
 ]
