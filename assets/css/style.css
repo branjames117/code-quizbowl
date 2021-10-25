@@ -1,0 +1,22 @@
+body {
+  background-color: rgb(243, 243, 243);
+  margin: 0 auto;
+  width: 60vw;
+}
+
+a {
+  color: hotpink;
+  text-decoration: none;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 45px;
+}
+
+main {
+  margin: 100px auto 0 auto;
+  text-align: center;
+  width: 60%;
+}
