@@ -20,9 +20,35 @@ function startQuiz() {
   // begin question loop
   let mainEl = document.querySelector('main')
 
-  for (let i = 1; i <= 20; i++) {
-    let questionEl = document.createElement('div')
-    questionEl.id = 'quiz-content'
-    mainEl.appendChild(questionEl)
+  for (let i = 0; i < questions.length; i++) {
+    let quizEl = document.createElement('div')
+    quizEl.id = 'quiz-content'
+
+    // get the question from the questions array
+    let questionEl = document.createElement('h2')
+    questionEl.textContent = questions[i].question
+    quizEl.appendChild(questionEl)
+
+    for (let j = 0; j < questions[i].choices.length; j++) {
+      let choiceEl = document.createElement('button')
+      choiceEl.textContent = questions[i].choices[j]
+      quizEl.appendChild(choiceEl)
+    }
+
+    mainEl.appendChild(quizEl)
   }
 }
+
+const questions = [
+  {
+    question: 'How would you access the second element in a given array?',
+    choices: ['array[0]', 'array[1]', 'array[2]', 'array.1'],
+    correctChoice: 'array[1]',
+  },
+  {
+    question:
+      "JavaScript's default behavior of moving declarations to the top is called:",
+    choices: ['Bubbling', 'Hoisting', 'Funneling', 'Lifting'],
+    correctChoice: 'Hoisting',
+  },
+]
