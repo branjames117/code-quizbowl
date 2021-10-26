@@ -18,6 +18,7 @@ header {
 main {
   display: flex;
   flex-basis: 100%;
+  flex-direction: column;
   justify-content: center;
   margin: 100px auto 0 auto;
   text-align: center;
@@ -29,6 +30,14 @@ footer {
   font-size: 1.2rem;
   justify-content: center;
   padding-top: 20px;
+}
+
+footer.correct {
+  color: green;
+}
+
+footer.incorrect {
+  color: red;
 }
 
 #quiz-content {

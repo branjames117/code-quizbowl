@@ -1,31 +1,25 @@
+// grab some initial elements
 let mainEl = document.querySelector('main')
 let resultEl = document.querySelector('#result-content')
 
-// quiz start button
+// Start Quiz button
 let quizStartEl = document.querySelector('#quiz-start')
 quizStartEl.addEventListener('click', startQuiz)
+// if Enter is pressed, click the Start Quiz button
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    quizStartEl.click()
+  }
+})
 
+// initialize gameplay variables
 let timerValue = 60
+let score = 0
+let playing = true
 
-// what do we need to do
-/*
-When the page loads, the high score is loaded from localStorage.
-
-When the Start Quiz button is clicked, the startQuiz() function is called, which clears the content section with a call to clearContent() function, then populates the section with a quiz questions consisting of a question and 2-4 possible choices. When one of the choices is clicked, the choice is compared to the correct answer.
-  If the incorrect choice is clicked, the timer is reduced, and an Incorrect message appears before the section is cleared again and the next question produced.
-  If the correct choice is clicked, a Correct message appears instead, and the score is incremented.
-  Regardless, when a choice is clicked, the other choices become unclickable.
-
-When the timer reaches 0 or all questions have been answered, the endQuiz() function is called, which presents an entry box for the user's initials (3 letters) and stores the score in localStorage.
-
-
-
-*/
+// to do: get high scores from local storage
 
 function startQuiz() {
-  // initialize the score
-  let score = 0
-
   // shuffle the questions
   questions.sort(() => Math.random() - 0.5)
 
@@ -45,57 +39,68 @@ function startQuiz() {
 }
 
 function renderQuestion(i) {
-  // clear the quiz content section
-  clearContent()
+  // first, check if there are still questions left to render
+  console.log(i)
+  if (i < questions.length) {
+    // clear the quiz content section
+    clearContent()
 
-  // create the elements for rendering a question
-  let quizEl = document.createElement('div')
-  quizEl.id = 'quiz-content'
+    // create the elements for rendering a question
+    let quizEl = document.createElement('div')
+    quizEl.id = 'quiz-content'
 
-  // get the question from the questions array and build more elements
-  let questionEl = document.createElement('h2')
-  questionEl.className = 'question'
-  questionEl.textContent = questions[i].question
-  quizEl.appendChild(questionEl)
+    // get the question from the questions array and build more elements
+    let questionEl = document.createElement('h2')
+    questionEl.className = 'question'
+    questionEl.textContent = questions[i].question
+    quizEl.appendChild(questionEl)
 
-  // loop through the choices and build elements out of each
-  for (let j = 0, k = 1; j < questions[i].choices.length; j++, k++) {
-    let choiceEl = document.createElement('button')
-    choiceEl.textContent = j + 1 + '. ' + questions[i].choices[j]
-    choiceEl.className = 'choice'
-    choiceEl.id = 'choice' + k
-    quizEl.appendChild(choiceEl)
-    if (choiceEl.textContent.slice(3) == questions[i].correctChoice) {
-      choiceEl.addEventListener('click', () => {
-        disableChoices()
-        console.log('Correct choice clicked!')
-        i++
-        resultEl.textContent = 'Correct!'
-        setTimeout(renderQuestion, 250, i)
-      })
-    } else {
-      choiceEl.addEventListener('click', () => {
-        disableChoices()
-        console.log('Incorrect choice clicked!')
-        timerValue -= 5
-        i++
-        resultEl.textContent = 'Incorrect!'
-        setTimeout(renderQuestion, 250, i)
-      })
+    // shuffle the choices
+    questions[i].choices.sort(() => Math.random() - 0.5)
+
+    // loop through the choices and build elements out of each
+    for (let j = 0, k = 1; j < questions[i].choices.length; j++, k++) {
+      let choiceEl = document.createElement('button')
+      choiceEl.textContent = '(' + k + ') ' + questions[i].choices[j]
+      choiceEl.className = 'choice'
+      choiceEl.id = 'choice' + k
+      quizEl.appendChild(choiceEl)
+      // if the choice matches the correct choice...
+      if (choiceEl.textContent.slice(4) == questions[i].correctChoice) {
+        choiceEl.addEventListener('click', () => {
+          disableChoices()
+          i++
+          score++
+          timerValue++
+          resultEl.className = 'correct'
+          resultEl.textContent = 'Correct! 1 second added!'
+          setTimeout(renderQuestion, 250, i)
+        })
+      } else {
+        choiceEl.addEventListener('click', () => {
+          disableChoices()
+          timerValue -= 5
+          i++
+          resultEl.className = 'incorrect'
+          resultEl.textContent = 'Incorrect! 5 seconds deducted!'
+          setTimeout(renderQuestion, 250, i)
+        })
+      }
     }
+
+    // add a keyboard listener
+    document.addEventListener('keydown', (e) => {
+      // if either 1-4 are pressed, click on corresponding button
+      if (['1', '2', '3', '4'].indexOf(e.key) >= 0 && playing) {
+        document.querySelector('#choice' + e.key).click()
+      }
+    })
+
+    mainEl.appendChild(quizEl)
+  } else {
+    // if there are no questions left to render, end the game
+    endQuiz()
   }
-
-  // add a keyboard listener
-  document.addEventListener('keydown', (e) => {
-    // if either 1-4 are pressed, click on corresponding button
-    console.log(e.key)
-    if (['0', '1', '2', '3', '4'].indexOf(e.key)) {
-      console.log(e.key)
-      document.querySelector('#choice' + e.key).click()
-    }
-  })
-
-  mainEl.appendChild(quizEl)
 }
 
 function clearContent() {
@@ -116,11 +121,29 @@ function disableChoices() {
   choice4El.setAttribute('disabled', 'true')
 }
 
+// end the quiz when all questions are answered or timer hits 0
 function endQuiz(intervalId) {
-  console.log('Game over!')
+  playing = false
   clearContent()
+  resultEl.textContent = ''
   // stop the timer
   clearInterval(intervalId)
+
+  let highScoreDisplayEl = document.createElement('h2')
+  highScoreDisplayEl.textContent = 'Your high score is: ' + score
+
+  // create the form to ask for high score submission
+  let highScoreFormEl = document.createElement('form')
+  highScoreFormEl.innerHTML =
+    '<label for="initials">Enter your initials: </label><input type="text" id="initials" name="initials" size="5" maxlength="5" /><br /><button type="submit">Submit</button>'
+  highScoreFormEl.addEventListener('submit', (e) => {
+    e.preventDefault()
+    // to do: use local storage to add the initials + score
+    console.log('Submitted')
+  })
+
+  mainEl.appendChild(highScoreDisplayEl)
+  mainEl.appendChild(highScoreFormEl)
 }
 
 // the questions
