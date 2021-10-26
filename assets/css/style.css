@@ -16,7 +16,49 @@ header {
 }
 
 main {
+  display: flex;
+  flex-basis: 100%;
+  justify-content: center;
   margin: 100px auto 0 auto;
   text-align: center;
-  width: 60%;
+  width: 100%;
+}
+
+footer {
+  display: flex;
+  font-size: 1.2rem;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+#quiz-content {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 500px;
+}
+
+.question {
+  text-align: left;
+}
+
+button {
+  background-color: palevioletred;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 1.12rem;
+  margin-top: 15px;
+  padding: 5px 10px;
+  text-align: left;
+  transition: transform 0.2s linear;
+}
+
+.btn-center {
+  text-align: center;
+}
+
+.choice:hover {
+  background-color: rgb(182, 77, 112);
+  cursor: pointer;
+  transform: scale(0.98);
 }

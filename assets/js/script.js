@@ -1,13 +1,36 @@
-console.log('Begin')
+let mainEl = document.querySelector('main')
+let resultEl = document.querySelector('#result-content')
 
 // quiz start button
 let quizStartEl = document.querySelector('#quiz-start')
 quizStartEl.addEventListener('click', startQuiz)
 
+let timerValue = 60
+
+// what do we need to do
+/*
+When the page loads, the high score is loaded from localStorage.
+
+When the Start Quiz button is clicked, the startQuiz() function is called, which clears the content section with a call to clearContent() function, then populates the section with a quiz questions consisting of a question and 2-4 possible choices. When one of the choices is clicked, the choice is compared to the correct answer.
+  If the incorrect choice is clicked, the timer is reduced, and an Incorrect message appears before the section is cleared again and the next question produced.
+  If the correct choice is clicked, a Correct message appears instead, and the score is incremented.
+  Regardless, when a choice is clicked, the other choices become unclickable.
+
+When the timer reaches 0 or all questions have been answered, the endQuiz() function is called, which presents an entry box for the user's initials (3 letters) and stores the score in localStorage.
+
+
+
+*/
+
 function startQuiz() {
+  // initialize the score
+  let score = 0
+
+  // shuffle the questions
+  questions.sort(() => Math.random() - 0.5)
+
   // initialize the timer
   let timerEl = document.querySelector('#timer')
-  let timerValue = 60
   let intervalId = setInterval(() => {
     timerValue--
     timerEl.textContent = timerValue
@@ -17,45 +40,85 @@ function startQuiz() {
     }
   }, 1000)
 
-  // remove quiz intro
-  let quizContentEl = document.querySelector('#quiz-content')
-  quizContentEl.remove()
-
   // begin question loop
-  let mainEl = document.querySelector('main')
+  setTimeout(renderQuestion, 250, 0)
+}
 
-  for (let i = 0; i < questions.length; i++) {
-    let quizEl = document.createElement('div')
-    quizEl.id = 'quiz-content'
+function renderQuestion(i) {
+  // clear the quiz content section
+  clearContent()
 
-    // get the question from the questions array
-    let questionEl = document.createElement('h2')
-    questionEl.textContent =
-      'Question ' + (i + 1) + '. ' + questions[i].question
-    quizEl.appendChild(questionEl)
+  // create the elements for rendering a question
+  let quizEl = document.createElement('div')
+  quizEl.id = 'quiz-content'
 
-    for (let j = 0; j < questions[i].choices.length; j++) {
-      let choiceEl = document.createElement('button')
-      choiceEl.textContent = questions[i].choices[j]
-      quizEl.appendChild(choiceEl)
-      if (choiceEl.textContent == questions[i].correctChoice) {
-        choiceEl.addEventListener('click', () => {
-          console.log('Correct choice clicked!')
-        })
-      } else {
-        choiceEl.addEventListener('click', () => {
-          console.log('Incorrect choice clicked!')
-          timerValue -= 5
-        })
-      }
+  // get the question from the questions array and build more elements
+  let questionEl = document.createElement('h2')
+  questionEl.className = 'question'
+  questionEl.textContent = questions[i].question
+  quizEl.appendChild(questionEl)
+
+  // loop through the choices and build elements out of each
+  for (let j = 0, k = 1; j < questions[i].choices.length; j++, k++) {
+    let choiceEl = document.createElement('button')
+    choiceEl.textContent = j + 1 + '. ' + questions[i].choices[j]
+    choiceEl.className = 'choice'
+    choiceEl.id = 'choice' + k
+    quizEl.appendChild(choiceEl)
+    if (choiceEl.textContent.slice(3) == questions[i].correctChoice) {
+      choiceEl.addEventListener('click', () => {
+        disableChoices()
+        console.log('Correct choice clicked!')
+        i++
+        resultEl.textContent = 'Correct!'
+        setTimeout(renderQuestion, 250, i)
+      })
+    } else {
+      choiceEl.addEventListener('click', () => {
+        disableChoices()
+        console.log('Incorrect choice clicked!')
+        timerValue -= 5
+        i++
+        resultEl.textContent = 'Incorrect!'
+        setTimeout(renderQuestion, 250, i)
+      })
     }
-
-    mainEl.appendChild(quizEl)
   }
+
+  // add a keyboard listener
+  document.addEventListener('keydown', (e) => {
+    // if either 1-4 are pressed, click on corresponding button
+    console.log(e.key)
+    if (['0', '1', '2', '3', '4'].indexOf(e.key)) {
+      console.log(e.key)
+      document.querySelector('#choice' + e.key).click()
+    }
+  })
+
+  mainEl.appendChild(quizEl)
+}
+
+function clearContent() {
+  let quizContentEl = document.querySelector('#quiz-content')
+  // remove quiz intro
+  quizContentEl.remove()
+}
+
+// briefly disable all choices after selection is made
+function disableChoices() {
+  let choice1El = document.querySelector('#choice1')
+  choice1El.setAttribute('disabled', 'true')
+  let choice2El = document.querySelector('#choice2')
+  choice2El.setAttribute('disabled', 'true')
+  let choice3El = document.querySelector('#choice3')
+  choice3El.setAttribute('disabled', 'true')
+  let choice4El = document.querySelector('#choice4')
+  choice4El.setAttribute('disabled', 'true')
 }
 
 function endQuiz(intervalId) {
   console.log('Game over!')
+  clearContent()
   // stop the timer
   clearInterval(intervalId)
 }
@@ -111,7 +174,7 @@ const questions = [
   {
     question:
       'Which of the following is NOT a correct way to comment in JavaScript?',
-    choices: ['// comment', '/* comment */', '<!-- comment -->'],
+    choices: ['// comment', '/* comment */', '<!-- comment -->', '// comment'],
     correctChoice: '<!-- comment -->',
   },
   {
