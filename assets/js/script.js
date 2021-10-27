@@ -18,7 +18,7 @@ let viewHighScoresEl = document.querySelector('#view-high-scores')
 viewHighScoresEl.addEventListener('click', renderScores)
 
 // initialize gameplay variables
-let timerValue = 60
+let timerValue = 1
 let score = 0
 let playing = true
 
@@ -159,12 +159,12 @@ function endQuiz(intervalId) {
 
   // create the high score display
   let highScoreDisplayEl = document.createElement('h2')
-  highScoreDisplayEl.textContent = 'Your high score is: ' + score
+  highScoreDisplayEl.textContent = 'Your score is: ' + score
 
   // create the form to ask for high score submission
   let highScoreFormEl = document.createElement('form')
   highScoreFormEl.innerHTML =
-    '<label for="initials">Enter your initials: </label><input type="text" id="initials" name="initials" size="5" maxlength="5" /><br /><button type="submit">Submit</button>'
+    '<label for="initials">Immortalize Your Initials </label><input type="text" id="initials" name="initials" size="3" maxlength="3" /><br /><button type="submit">Save</button>'
   highScoreFormEl.addEventListener('submit', (e) => {
     // create a high score object containing initials and score
     let highScoreObj = {

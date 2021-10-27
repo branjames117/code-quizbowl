@@ -154,6 +154,34 @@ button:hover {
   text-align: center;
 }
 
+/* High score form */
+
+form {
+  display: flex;
+  flex-direction: column;
+  margin: 20px auto;
+  width: 100%;
+}
+
+form input {
+  border: 2px solid palevioletred;
+  color: palevioletred;
+  font-size: 2rem;
+  padding: 5px;
+  width: 80px;
+  margin: 15px auto;
+}
+
+form input:focus {
+  border-color: palevioletred;
+}
+
+form button {
+  margin: -20px auto;
+  text-align: center;
+  width: 100px;
+}
+
 /* Footer styles - where Correct/Incorrect feedback appears */
 
 footer {

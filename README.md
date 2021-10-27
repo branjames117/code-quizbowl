@@ -2,11 +2,12 @@
 
 ## Description
 
-- A Start button to begin the timed multiple-choice quiz
-- When a question is answered, the next question appears
-- When a question is answered incorrectly, the timer is reduced
-- When all questions are answered or the timer reaches 0, the game ends
-- When the game ends, initials and high score can be saved
+This is a coding quiz app built for Week 4 of the Vanderbilt Coding Boot Camp, with the following features:
+
+- 20 multiple-choice questions about JavaScript fundamentals that are shuffled each time the quiz is taken.
+- A 60-second timer: 5 seconds are deducted for incorrect answers, and 1 second is added for correct answers.
+- Sound effects from [freesound.org](https://freesound.org/).
+- High score persistence via localStorage.
 
 ## Table of Contents
 
@@ -23,7 +24,7 @@ Clone the repository in a CLI using the command `git clone` to download all sour
 
 Upload HTML source code and asset files to hosting service such as GitHub Pages.
 
-The landing page is hosted [here](#).
+The landing page is hosted [here](https://branjames117.github.io/code-quizbowl/).
 
 ![Screenshot](./assets/images/screenshot.jpg)
 
