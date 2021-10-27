@@ -1,3 +1,10 @@
+/* General styles */
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
 body {
   background-color: rgb(22, 22, 22);
   color: white;
@@ -7,10 +14,7 @@ body {
   width: 60vw;
 }
 
-a {
-  color: hotpink;
-  text-decoration: none;
-}
+/* Top bar styles (includes View high scores btn and timer */
 
 header {
   display: flex;
@@ -22,6 +26,81 @@ header {
   color: palevioletred;
   font-size: 1.3rem;
 }
+/* View high scores modal styles */
+
+#view-high-scores {
+  color: palevioletred;
+}
+
+#view-high-scores:hover,
+#clear-scores:hover,
+#view-high-scores:focus,
+#clear-scores:focus {
+  color: rgb(199, 79, 119);
+  cursor: pointer;
+}
+
+#scores-modal {
+  display: none;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+  height: 100%;
+  left: 0;
+  top: 0;
+  overflow: auto;
+  padding-top: 60px;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+
+#score-list {
+  list-style-type: none;
+}
+
+#score-list li {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: 30%;
+}
+
+#score-list li span {
+  text-align: left;
+}
+
+#modal-content {
+  background-color: black;
+  border: 1px solid palevioletred;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+  width: 50%;
+}
+
+#close-modal {
+  color: palevioletred;
+  font-size: 30px;
+  font-weight: bold;
+  position: absolute;
+  right: 15px;
+  top: 5px;
+}
+
+#close-modal:hover {
+  color: rgb(199, 79, 119);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#clear-scores {
+  color: palevioletred;
+  display: block;
+  margin-top: 50px;
+  text-align: center;
+}
+
+/* Main styles - where the quiz content appears */
 
 main {
   display: flex;
@@ -33,28 +112,13 @@ main {
   width: 100%;
 }
 
-footer {
-  display: flex;
-  font-size: 1.2rem;
-  justify-content: center;
-  padding-top: 20px;
-}
-
-footer.correct {
-  color: green;
-}
-
-footer.incorrect {
-  color: red;
-}
-
-#result-content {
-  transition: transform 0.5s linear;
-}
-
 #quiz-content {
   display: flex;
   flex-direction: column;
+}
+
+#quiz-content h2 {
+  margin-bottom: 25px;
 }
 
 .question {
@@ -80,5 +144,27 @@ button:hover {
 }
 
 .btn-center {
+  margin-top: 25px;
   text-align: center;
+}
+
+/* Footer styles - where Correct/Incorrect feedback appears */
+
+footer {
+  display: flex;
+  font-size: 1.2rem;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+footer.correct {
+  color: green;
+}
+
+footer.incorrect {
+  color: red;
+}
+
+#result-content {
+  transition: transform 0.5s linear;
 }

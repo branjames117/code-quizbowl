@@ -9,9 +9,17 @@
   </head>
   <body>
     <header>
-      <a href="#">View high scores</a>
+      <span id="view-high-scores">View high scores</span>
       <div><span id="timer">60</span> seconds left.</div>
     </header>
+
+    <div id="scores-modal">
+      <div id="modal-content">
+        <span id="close-modal">&times;</span>
+        <ul id="score-list"></ul>
+        <span id="clear-scores">Clear all scores</span>
+      </div>
+    </div>
 
     <main>
       <div id="quiz-content">

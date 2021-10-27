@@ -1,4 +1,5 @@
 // grab some initial elements we will need globally
+let bodyEl = document.querySelector('body')
 let mainEl = document.querySelector('main')
 let resultEl = document.querySelector('#result-content')
 
@@ -11,6 +12,10 @@ document.addEventListener('keydown', (e) => {
     quizStartEl.click()
   }
 })
+
+// view high scores button functionality
+let viewHighScoresEl = document.querySelector('#view-high-scores')
+viewHighScoresEl.addEventListener('click', renderScores)
 
 // initialize gameplay variables
 let timerValue = 60
@@ -160,7 +165,6 @@ function endQuiz(intervalId) {
   highScoreFormEl.innerHTML =
     '<label for="initials">Enter your initials: </label><input type="text" id="initials" name="initials" size="5" maxlength="5" /><br /><button type="submit">Submit</button>'
   highScoreFormEl.addEventListener('submit', (e) => {
-    e.preventDefault()
     // create a high score object containing initials and score
     let highScoreObj = {
       initials: document.getElementById('initials').value,
@@ -173,6 +177,52 @@ function endQuiz(intervalId) {
 
   mainEl.appendChild(highScoreDisplayEl)
   mainEl.appendChild(highScoreFormEl)
+}
+
+function renderScores() {
+  // sort scores from highest to lowest
+  highScores.sort((a, b) => parseInt(b.score) - parseInt(a.score))
+
+  let scoreListEl = document.querySelector('#score-list')
+  let scoresModalEl = document.querySelector('#scores-modal')
+  let closeModalEl = document.querySelector('#close-modal')
+  let clearScoresEl = document.querySelector('#clear-scores')
+
+  // close modal button functionality
+  closeModalEl.addEventListener('click', () => {
+    scoresModalEl.style.display = 'none'
+    // delete all children of the scores list one by one
+    // so the score list can be refreshed each time modal is opened
+    while (scoreListEl.lastChild) {
+      scoreListEl.removeChild(scoreListEl.lastChild)
+    }
+  })
+
+  // clear scores button functionality
+  clearScoresEl.addEventListener('click', () => {
+    // clear it in localStorage and also in current memory
+    localStorage.highScores = []
+    highScores = []
+    while (scoreListEl.lastChild) {
+      scoreListEl.removeChild(scoreListEl.lastChild)
+    }
+  })
+
+  // populate the scores modal
+  for (let i = 0; i < highScores.length; i++) {
+    let scoreEl = document.createElement('li')
+    scoreEl.innerHTML =
+      '<span>' +
+      highScores[i].initials +
+      '</span>' +
+      '<span>' +
+      highScores[i].score +
+      '</span>'
+    scoreListEl.appendChild(scoreEl)
+  }
+
+  // show the scores modal
+  scoresModalEl.style.display = 'block'
 }
 
 // the questions
