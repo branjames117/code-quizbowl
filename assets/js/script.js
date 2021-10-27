@@ -48,21 +48,21 @@ function startQuiz() {
     timerEl.textContent = timerValue
     // if timer drops below 0, end the game
     if (timerValue <= 0) {
-      playing = false
       endQuiz(intervalId)
     }
   }, 1000)
 
   // render first question 250ms after start quiz button is pressed
-  setTimeout(renderQuestion, 250, 0)
+  setTimeout(renderQuestion, 250, 0, intervalId)
 }
 
 // render question from the shuffled questions array
-function renderQuestion(i) {
+function renderQuestion(i, intervalId) {
   // first, check if there are still questions left to render
   if (i < questions.length && playing) {
     // clear the quiz content section
-    clearContent()
+    let quizContentEl = document.querySelector('#quiz-content')
+    quizContentEl.remove()
 
     // create the container element
     let quizEl = document.createElement('div')
@@ -97,7 +97,10 @@ function renderQuestion(i) {
           resultEl.className = 'correct'
           resultEl.classList.add('move')
           resultEl.textContent = 'Correct! 1 second added!'
-          setTimeout(renderQuestion, 250, ++i) // render next question
+          // render next question if time remains
+          if (timerValue > 0) {
+            setTimeout(renderQuestion, 250, ++i) // render next question
+          }
         })
       } else {
         choiceEl.addEventListener('click', () => {
@@ -106,7 +109,9 @@ function renderQuestion(i) {
           timerValue -= 5 // decrease the timer by 5
           resultEl.className = 'incorrect'
           resultEl.textContent = 'Incorrect! 5 seconds deducted!'
-          setTimeout(renderQuestion, 250, ++i) // render next question
+          if (timerValue > 0) {
+            setTimeout(renderQuestion, 250, ++i) // render next question
+          }
         })
       }
     }
@@ -124,14 +129,8 @@ function renderQuestion(i) {
   } else {
     // if there are no questions left to render, end the game
     playing = false
-    endQuiz()
+    endQuiz(intervalId)
   }
-}
-
-// clear the main element for a fresh render
-function clearContent() {
-  let quizContentEl = document.querySelector('#quiz-content')
-  quizContentEl.remove()
 }
 
 // briefly disable all choices after a selection is made
@@ -148,7 +147,9 @@ function disableChoices() {
 
 // end the quiz when all questions are answered or timer hits 0
 function endQuiz(intervalId) {
-  clearContent()
+  playing = false
+  let quizContentEl = document.querySelector('#quiz-content')
+  quizContentEl.remove()
 
   // clear the results element
   resultEl.textContent = ''
@@ -167,7 +168,8 @@ function endQuiz(intervalId) {
   highScoreFormEl.addEventListener('submit', (e) => {
     // create a high score object containing initials and score
     let highScoreObj = {
-      initials: document.getElementById('initials').value,
+      // if user didn't give initials, use N/A
+      initials: document.getElementById('initials').value || 'N/A',
       score,
     }
     // store that object in local storage
