@@ -18,7 +18,7 @@ let viewHighScoresEl = document.querySelector('#view-high-scores')
 viewHighScoresEl.addEventListener('click', renderScores)
 
 // initialize gameplay variables
-let timerValue = 1
+let timerValue = 60
 let score = 0
 let playing = true
 
