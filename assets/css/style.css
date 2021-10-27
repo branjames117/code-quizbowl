@@ -1,5 +1,8 @@
 body {
-  background-color: rgb(243, 243, 243);
+  background-color: rgb(22, 22, 22);
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1.4;
   margin: 0 auto;
   width: 60vw;
 }
@@ -13,6 +16,11 @@ header {
   display: flex;
   justify-content: space-between;
   padding-top: 45px;
+}
+
+#timer {
+  color: palevioletred;
+  font-size: 1.3rem;
 }
 
 main {
@@ -40,10 +48,13 @@ footer.incorrect {
   color: red;
 }
 
+#result-content {
+  transition: transform 0.5s linear;
+}
+
 #quiz-content {
   display: flex;
   flex-direction: column;
-  flex-basis: 500px;
 }
 
 .question {
@@ -62,12 +73,12 @@ button {
   transition: transform 0.2s linear;
 }
 
-.btn-center {
-  text-align: center;
-}
-
-.choice:hover {
+button:hover {
   background-color: rgb(182, 77, 112);
   cursor: pointer;
   transform: scale(0.98);
+}
+
+.btn-center {
+  text-align: center;
 }

@@ -1,8 +1,8 @@
-// grab some initial elements
+// grab some initial elements we will need globally
 let mainEl = document.querySelector('main')
 let resultEl = document.querySelector('#result-content')
 
-// Start Quiz button
+// start quiz button functionality
 let quizStartEl = document.querySelector('#quiz-start')
 quizStartEl.addEventListener('click', startQuiz)
 // if Enter is pressed, click the Start Quiz button
@@ -17,9 +17,22 @@ let timerValue = 60
 let score = 0
 let playing = true
 
-// to do: get high scores from local storage
+// initialize gameplay sounds
+let correctSound = new Audio('./assets/sound/correct.wav')
+let incorrectSound = new Audio('./assets/sound/incorrect.mp3')
 
+// initialize high scores from localStorage if exists, else create it
+let highScores = []
+if (localStorage.highScores) {
+  highScores = JSON.parse(localStorage.highScores)
+} else {
+  localStorage.highScores = []
+}
+
+// start quiz
 function startQuiz() {
+  correctSound.play() // positive feedback, thanks for starting!
+
   // shuffle the questions
   questions.sort(() => Math.random() - 0.5)
 
@@ -30,65 +43,70 @@ function startQuiz() {
     timerEl.textContent = timerValue
     // if timer drops below 0, end the game
     if (timerValue <= 0) {
+      playing = false
       endQuiz(intervalId)
     }
   }, 1000)
 
-  // begin question loop
+  // render first question 250ms after start quiz button is pressed
   setTimeout(renderQuestion, 250, 0)
 }
 
+// render question from the shuffled questions array
 function renderQuestion(i) {
   // first, check if there are still questions left to render
-  console.log(i)
-  if (i < questions.length) {
+  if (i < questions.length && playing) {
     // clear the quiz content section
     clearContent()
 
-    // create the elements for rendering a question
+    // create the container element
     let quizEl = document.createElement('div')
     quizEl.id = 'quiz-content'
 
-    // get the question from the questions array and build more elements
+    // get the question from the array and turn it into an h2
     let questionEl = document.createElement('h2')
     questionEl.className = 'question'
     questionEl.textContent = questions[i].question
     quizEl.appendChild(questionEl)
 
-    // shuffle the choices
-    questions[i].choices.sort(() => Math.random() - 0.5)
+    // shuffle the choices for the chosen question
+    let choices = questions[i].choices
+    choices.sort(() => Math.random() - 0.5)
+    let correctChoice = questions[i].correctChoice
 
-    // loop through the choices and build elements out of each
+    // loop through the shuffled choices and build button elements for each
+    // j is the index for the array (0-3), k is for the keypress (1-4)
     for (let j = 0, k = 1; j < questions[i].choices.length; j++, k++) {
       let choiceEl = document.createElement('button')
-      choiceEl.textContent = '(' + k + ') ' + questions[i].choices[j]
+      choiceEl.textContent = '(' + k + ') ' + choices[j]
       choiceEl.className = 'choice'
       choiceEl.id = 'choice' + k
       quizEl.appendChild(choiceEl)
       // if the choice matches the correct choice...
-      if (choiceEl.textContent.slice(4) == questions[i].correctChoice) {
+      if (choiceEl.textContent.slice(4) == correctChoice) {
         choiceEl.addEventListener('click', () => {
-          disableChoices()
-          i++
-          score++
-          timerValue++
+          correctSound.play() // positive feedback
+          disableChoices() // temporarily disable the buttons
+          score++ // increment the score
+          timerValue++ // add a second to the timer
           resultEl.className = 'correct'
+          resultEl.classList.add('move')
           resultEl.textContent = 'Correct! 1 second added!'
-          setTimeout(renderQuestion, 250, i)
+          setTimeout(renderQuestion, 250, ++i) // render next question
         })
       } else {
         choiceEl.addEventListener('click', () => {
-          disableChoices()
-          timerValue -= 5
-          i++
+          incorrectSound.play() // negative feedback
+          disableChoices() // temporarily disable the buttons
+          timerValue -= 5 // decrease the timer by 5
           resultEl.className = 'incorrect'
           resultEl.textContent = 'Incorrect! 5 seconds deducted!'
-          setTimeout(renderQuestion, 250, i)
+          setTimeout(renderQuestion, 250, ++i) // render next question
         })
       }
     }
 
-    // add a keyboard listener
+    // add a keyboard listener to listen for choice shortcuts
     document.addEventListener('keydown', (e) => {
       // if either 1-4 are pressed, click on corresponding button
       if (['1', '2', '3', '4'].indexOf(e.key) >= 0 && playing) {
@@ -96,20 +114,22 @@ function renderQuestion(i) {
       }
     })
 
+    // append question element to main
     mainEl.appendChild(quizEl)
   } else {
     // if there are no questions left to render, end the game
+    playing = false
     endQuiz()
   }
 }
 
+// clear the main element for a fresh render
 function clearContent() {
   let quizContentEl = document.querySelector('#quiz-content')
-  // remove quiz intro
   quizContentEl.remove()
 }
 
-// briefly disable all choices after selection is made
+// briefly disable all choices after a selection is made
 function disableChoices() {
   let choice1El = document.querySelector('#choice1')
   choice1El.setAttribute('disabled', 'true')
@@ -123,12 +143,15 @@ function disableChoices() {
 
 // end the quiz when all questions are answered or timer hits 0
 function endQuiz(intervalId) {
-  playing = false
   clearContent()
+
+  // clear the results element
   resultEl.textContent = ''
+
   // stop the timer
   clearInterval(intervalId)
 
+  // create the high score display
   let highScoreDisplayEl = document.createElement('h2')
   highScoreDisplayEl.textContent = 'Your high score is: ' + score
 
@@ -138,8 +161,14 @@ function endQuiz(intervalId) {
     '<label for="initials">Enter your initials: </label><input type="text" id="initials" name="initials" size="5" maxlength="5" /><br /><button type="submit">Submit</button>'
   highScoreFormEl.addEventListener('submit', (e) => {
     e.preventDefault()
-    // to do: use local storage to add the initials + score
-    console.log('Submitted')
+    // create a high score object containing initials and score
+    let highScoreObj = {
+      initials: document.getElementById('initials').value,
+      score,
+    }
+    // store that object in local storage
+    highScores.push(highScoreObj)
+    localStorage.highScores = JSON.stringify(highScores)
   })
 
   mainEl.appendChild(highScoreDisplayEl)
