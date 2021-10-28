@@ -157,8 +157,12 @@ function endQuiz(intervalId) {
   // stop the timer
   clearInterval(intervalId)
 
+  // calculate the score - if all questions answered correctly, add seconds left on timer as bonus
+  score = score == 20 ? score + timerValue : score
+
   // create the high score display
   let highScoreDisplayEl = document.createElement('h2')
+  // if score = 20 (all questions right), add seconds remaining on timer to score
   highScoreDisplayEl.textContent = 'Your score is: ' + score
 
   // create the form to ask for high score submission
@@ -170,6 +174,7 @@ function endQuiz(intervalId) {
     let highScoreObj = {
       // if user didn't give initials, use N/A
       initials: document.getElementById('initials').value || 'N/A',
+      // if score is 20 (max) add the seconds left on timer to their score as bonus points
       score,
     }
     // store that object in local storage
