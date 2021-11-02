@@ -18,11 +18,12 @@ let viewHighScoresEl = document.querySelector('#view-high-scores')
 viewHighScoresEl.addEventListener('click', renderScores)
 
 // initialize gameplay variables
-let timerValue = 60
+let timerValue = 90
 let score = 0
 let playing = true
 
 // initialize gameplay sounds
+// to do - put in a switch so user can disable sound if desired
 let correctSound = new Audio('./assets/sound/correct.wav')
 let incorrectSound = new Audio('./assets/sound/incorrect.mp3')
 
