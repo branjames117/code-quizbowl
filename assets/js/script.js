@@ -17,6 +17,11 @@ document.addEventListener('keydown', (e) => {
 let viewHighScoresEl = document.querySelector('#view-high-scores')
 viewHighScoresEl.addEventListener('click', renderScores)
 
+// enable/disable sound button functionality
+let toggleSoundEl = document.querySelector('#toggle-sound')
+toggleSoundEl.addEventListener('click', toggleSound)
+let soundEnabled = false
+
 // initialize gameplay variables
 let timerValue = 90
 let score = 0
@@ -37,7 +42,9 @@ if (localStorage.highScores) {
 
 // start quiz
 function startQuiz() {
-  correctSound.play() // positive feedback, thanks for starting!
+  if (soundEnabled) {
+    correctSound.play() // positive feedback, thanks for starting!
+  }
 
   // shuffle the questions
   questions.sort(() => Math.random() - 0.5)
@@ -91,7 +98,9 @@ function renderQuestion(i, intervalId) {
       // if the choice matches the correct choice...
       if (choiceEl.textContent.slice(4) == correctChoice) {
         choiceEl.addEventListener('click', () => {
-          correctSound.play() // positive feedback
+          if (soundEnabled) {
+            correctSound.play() // positive feedback
+          }
           disableChoices() // temporarily disable the buttons
           score++ // increment the score
           timerValue++ // add a second to the timer
@@ -105,7 +114,10 @@ function renderQuestion(i, intervalId) {
         })
       } else {
         choiceEl.addEventListener('click', () => {
-          incorrectSound.play() // negative feedback
+          // negative feedback
+          if (soundEnabled) {
+            incorrectSound.play()
+          }
           disableChoices() // temporarily disable the buttons
           timerValue -= 5 // decrease the timer by 5
           resultEl.className = 'incorrect'
@@ -231,6 +243,15 @@ function renderScores() {
 
   // show the scores modal
   scoresModalEl.style.display = 'block'
+}
+
+function toggleSound() {
+  soundEnabled = soundEnabled ? false : true
+  if (soundEnabled) {
+    toggleSoundEl.textContent = 'Disable sound'
+  } else {
+    toggleSoundEl.textContent = 'Enable sound'
+  }
 }
 
 // the questions

@@ -24,18 +24,23 @@ header {
 
 #timer {
   color: palevioletred;
-  font-size: 1.3rem;
 }
 /* View high scores modal styles */
 
-#view-high-scores {
+#view-high-scores,
+#toggle-sound {
   color: palevioletred;
+  border: solid 1px palevioletred;
+  border-radius: 10px;
+  padding: 5px 8px;
 }
 
 #view-high-scores:hover,
 #clear-scores:hover,
 #view-high-scores:focus,
-#clear-scores:focus {
+#clear-scores:focus,
+#toggle-sound:hover,
+#toggle-sound:focus {
   color: rgb(199, 79, 119);
   cursor: pointer;
 }
