@@ -1,67 +1,69 @@
 // grab some initial elements we will need globally
-let bodyEl = document.querySelector('body')
-let mainEl = document.querySelector('main')
-let resultEl = document.querySelector('#result-content')
-
-// start quiz button functionality
-let quizStartEl = document.querySelector('#quiz-start')
-quizStartEl.addEventListener('click', startQuiz)
-// if Enter is pressed, click the Start Quiz button
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    quizStartEl.click()
-  }
-})
-
-// view high scores button functionality
-let viewHighScoresEl = document.querySelector('#view-high-scores')
-viewHighScoresEl.addEventListener('click', renderScores)
-
-// enable/disable sound button functionality
-let toggleSoundEl = document.querySelector('#toggle-sound')
-toggleSoundEl.addEventListener('click', toggleSound)
-let soundEnabled = false
+let bodyEl = document.querySelector('body');
+let mainEl = document.querySelector('main');
+let resultEl = document.querySelector('#result-content');
 
 // initialize gameplay variables
-let timerValue = 90
-let score = 0
-let playing = true
+let timerValue = 90;
+let score = 0;
+let playing = false;
+
+// start quiz button functionality
+let quizStartEl = document.querySelector('#quiz-start');
+quizStartEl.addEventListener('click', startQuiz);
+// if Enter is pressed, click the Start Quiz button
+// only do anything with this listener if the quiz hasn't already started
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !playing) {
+    quizStartEl.click();
+  }
+});
+
+// view high scores button functionality
+let viewHighScoresEl = document.querySelector('#view-high-scores');
+viewHighScoresEl.addEventListener('click', renderScores);
+
+// enable/disable sound button functionality
+let toggleSoundEl = document.querySelector('#toggle-sound');
+toggleSoundEl.addEventListener('click', toggleSound);
+let soundEnabled = false;
 
 // initialize gameplay sounds
 // to do - put in a switch so user can disable sound if desired
-let correctSound = new Audio('./assets/sound/correct.wav')
-let incorrectSound = new Audio('./assets/sound/incorrect.mp3')
+let correctSound = new Audio('./assets/sound/correct.wav');
+let incorrectSound = new Audio('./assets/sound/incorrect.mp3');
 
 // initialize high scores from localStorage if exists, else create it
-let highScores = []
+let highScores = [];
 if (localStorage.highScores) {
-  highScores = JSON.parse(localStorage.highScores)
+  highScores = JSON.parse(localStorage.highScores);
 } else {
-  localStorage.highScores = []
+  localStorage.highScores = [];
 }
 
 // start quiz
 function startQuiz() {
+  playing = true;
   if (soundEnabled) {
-    correctSound.play() // positive feedback, thanks for starting!
+    correctSound.play(); // positive feedback, thanks for starting!
   }
 
   // shuffle the questions
-  questions.sort(() => Math.random() - 0.5)
+  questions.sort(() => Math.random() - 0.5);
 
   // initialize the timer
-  let timerEl = document.querySelector('#timer')
+  let timerEl = document.querySelector('#timer');
   let intervalId = setInterval(() => {
-    timerValue--
-    timerEl.textContent = timerValue
+    timerValue--;
+    timerEl.textContent = timerValue;
     // if timer drops below 0, end the game
     if (timerValue <= 0) {
-      endQuiz(intervalId)
+      endQuiz(intervalId);
     }
-  }, 1000)
+  }, 1000);
 
   // render first question 250ms after start quiz button is pressed
-  setTimeout(renderQuestion, 250, 0, intervalId)
+  setTimeout(renderQuestion, 250, 0, intervalId);
 }
 
 // render question from the shuffled questions array
@@ -69,63 +71,63 @@ function renderQuestion(i, intervalId) {
   // first, check if there are still questions left to render
   if (i < questions.length && playing) {
     // clear the quiz content section
-    let quizContentEl = document.querySelector('#quiz-content')
-    quizContentEl.remove()
+    let quizContentEl = document.querySelector('#quiz-content');
+    quizContentEl.remove();
 
     // create the container element
-    let quizEl = document.createElement('div')
-    quizEl.id = 'quiz-content'
+    let quizEl = document.createElement('div');
+    quizEl.id = 'quiz-content';
 
     // get the question from the array and turn it into an h2
-    let questionEl = document.createElement('h2')
-    questionEl.className = 'question'
-    questionEl.textContent = questions[i].question
-    quizEl.appendChild(questionEl)
+    let questionEl = document.createElement('h2');
+    questionEl.className = 'question';
+    questionEl.textContent = questions[i].question;
+    quizEl.appendChild(questionEl);
 
     // shuffle the choices for the chosen question
-    let choices = questions[i].choices
-    choices.sort(() => Math.random() - 0.5)
-    let correctChoice = questions[i].correctChoice
+    let choices = questions[i].choices;
+    choices.sort(() => Math.random() - 0.5);
+    let correctChoice = questions[i].correctChoice;
 
     // loop through the shuffled choices and build button elements for each
     // j is the index for the array (0-3), k is for the keypress (1-4)
     for (let j = 0, k = 1; j < questions[i].choices.length; j++, k++) {
-      let choiceEl = document.createElement('button')
-      choiceEl.textContent = '(' + k + ') ' + choices[j]
-      choiceEl.className = 'choice'
-      choiceEl.id = 'choice' + k
-      quizEl.appendChild(choiceEl)
+      let choiceEl = document.createElement('button');
+      choiceEl.textContent = '(' + k + ') ' + choices[j];
+      choiceEl.className = 'choice';
+      choiceEl.id = 'choice' + k;
+      quizEl.appendChild(choiceEl);
       // if the choice matches the correct choice...
       if (choiceEl.textContent.slice(4) == correctChoice) {
         choiceEl.addEventListener('click', () => {
           if (soundEnabled) {
-            correctSound.play() // positive feedback
+            correctSound.play(); // positive feedback
           }
-          disableChoices() // temporarily disable the buttons
-          score++ // increment the score
-          timerValue++ // add a second to the timer
-          resultEl.className = 'correct'
-          resultEl.classList.add('move')
-          resultEl.textContent = 'Correct! 1 second added!'
+          disableChoices(); // temporarily disable the buttons
+          score++; // increment the score
+          timerValue++; // add a second to the timer
+          resultEl.className = 'correct';
+          resultEl.classList.add('move');
+          resultEl.textContent = 'Correct! 1 second added!';
           // render next question if time remains
           if (timerValue > 0) {
-            setTimeout(renderQuestion, 250, ++i) // render next question
+            setTimeout(renderQuestion, 250, ++i); // render next question
           }
-        })
+        });
       } else {
         choiceEl.addEventListener('click', () => {
           // negative feedback
           if (soundEnabled) {
-            incorrectSound.play()
+            incorrectSound.play();
           }
-          disableChoices() // temporarily disable the buttons
-          timerValue -= 5 // decrease the timer by 5
-          resultEl.className = 'incorrect'
-          resultEl.textContent = 'Incorrect! 5 seconds deducted!'
+          disableChoices(); // temporarily disable the buttons
+          timerValue -= 5; // decrease the timer by 5
+          resultEl.className = 'incorrect';
+          resultEl.textContent = 'Incorrect! 5 seconds deducted!';
           if (timerValue > 0) {
-            setTimeout(renderQuestion, 250, ++i) // render next question
+            setTimeout(renderQuestion, 250, ++i); // render next question
           }
-        })
+        });
       }
     }
 
@@ -133,55 +135,55 @@ function renderQuestion(i, intervalId) {
     document.addEventListener('keydown', (e) => {
       // if either 1-4 are pressed, click on corresponding button
       if (['1', '2', '3', '4'].indexOf(e.key) >= 0 && playing) {
-        document.querySelector('#choice' + e.key).click()
+        document.querySelector('#choice' + e.key).click();
       }
-    })
+    });
 
     // append question element to main
-    mainEl.appendChild(quizEl)
+    mainEl.appendChild(quizEl);
   } else {
     // if there are no questions left to render, end the game
-    playing = false
-    endQuiz(intervalId)
+    playing = false;
+    endQuiz(intervalId);
   }
 }
 
 // briefly disable all choices after a selection is made
 function disableChoices() {
-  let choice1El = document.querySelector('#choice1')
-  choice1El.setAttribute('disabled', 'true')
-  let choice2El = document.querySelector('#choice2')
-  choice2El.setAttribute('disabled', 'true')
-  let choice3El = document.querySelector('#choice3')
-  choice3El.setAttribute('disabled', 'true')
-  let choice4El = document.querySelector('#choice4')
-  choice4El.setAttribute('disabled', 'true')
+  let choice1El = document.querySelector('#choice1');
+  choice1El.setAttribute('disabled', 'true');
+  let choice2El = document.querySelector('#choice2');
+  choice2El.setAttribute('disabled', 'true');
+  let choice3El = document.querySelector('#choice3');
+  choice3El.setAttribute('disabled', 'true');
+  let choice4El = document.querySelector('#choice4');
+  choice4El.setAttribute('disabled', 'true');
 }
 
 // end the quiz when all questions are answered or timer hits 0
 function endQuiz(intervalId) {
-  playing = false
-  let quizContentEl = document.querySelector('#quiz-content')
-  quizContentEl.remove()
+  playing = false;
+  let quizContentEl = document.querySelector('#quiz-content');
+  quizContentEl.remove();
 
   // clear the results element
-  resultEl.textContent = ''
+  resultEl.textContent = '';
 
   // stop the timer
-  clearInterval(intervalId)
+  clearInterval(intervalId);
 
   // calculate the score - if all questions answered correctly, add seconds left on timer as bonus
-  score = score == 20 ? score + timerValue : score
+  score = score == 20 ? score + timerValue : score;
 
   // create the high score display
-  let highScoreDisplayEl = document.createElement('h2')
+  let highScoreDisplayEl = document.createElement('h2');
   // if score = 20 (all questions right), add seconds remaining on timer to score
-  highScoreDisplayEl.textContent = 'Your score is: ' + score
+  highScoreDisplayEl.textContent = 'Your score is: ' + score;
 
   // create the form to ask for high score submission
-  let highScoreFormEl = document.createElement('form')
+  let highScoreFormEl = document.createElement('form');
   highScoreFormEl.innerHTML =
-    '<label for="initials">Immortalize Your Initials </label><input type="text" id="initials" name="initials" size="3" maxlength="3" /><br /><button type="submit">Save</button>'
+    '<label for="initials">Immortalize Your Initials </label><input type="text" id="initials" name="initials" size="3" maxlength="3" /><br /><button type="submit">Save</button>';
   highScoreFormEl.addEventListener('submit', (e) => {
     // create a high score object containing initials and score
     let highScoreObj = {
@@ -189,68 +191,68 @@ function endQuiz(intervalId) {
       initials: document.getElementById('initials').value || 'N/A',
       // if score is 20 (max) add the seconds left on timer to their score as bonus points
       score,
-    }
+    };
     // store that object in local storage
-    highScores.push(highScoreObj)
-    localStorage.highScores = JSON.stringify(highScores)
-  })
+    highScores.push(highScoreObj);
+    localStorage.highScores = JSON.stringify(highScores);
+  });
 
-  mainEl.appendChild(highScoreDisplayEl)
-  mainEl.appendChild(highScoreFormEl)
+  mainEl.appendChild(highScoreDisplayEl);
+  mainEl.appendChild(highScoreFormEl);
 }
 
 function renderScores() {
   // sort scores from highest to lowest
-  highScores.sort((a, b) => parseInt(b.score) - parseInt(a.score))
+  highScores.sort((a, b) => parseInt(b.score) - parseInt(a.score));
 
-  let scoreListEl = document.querySelector('#score-list')
-  let scoresModalEl = document.querySelector('#scores-modal')
-  let closeModalEl = document.querySelector('#close-modal')
-  let clearScoresEl = document.querySelector('#clear-scores')
+  let scoreListEl = document.querySelector('#score-list');
+  let scoresModalEl = document.querySelector('#scores-modal');
+  let closeModalEl = document.querySelector('#close-modal');
+  let clearScoresEl = document.querySelector('#clear-scores');
 
   // close modal button functionality
   closeModalEl.addEventListener('click', () => {
-    scoresModalEl.style.display = 'none'
+    scoresModalEl.style.display = 'none';
     // delete all children of the scores list one by one
     // so the score list can be refreshed each time modal is opened
     while (scoreListEl.lastChild) {
-      scoreListEl.removeChild(scoreListEl.lastChild)
+      scoreListEl.removeChild(scoreListEl.lastChild);
     }
-  })
+  });
 
   // clear scores button functionality
   clearScoresEl.addEventListener('click', () => {
     // clear it in localStorage and also in current memory
-    localStorage.highScores = []
-    highScores = []
+    localStorage.highScores = [];
+    highScores = [];
     while (scoreListEl.lastChild) {
-      scoreListEl.removeChild(scoreListEl.lastChild)
+      scoreListEl.removeChild(scoreListEl.lastChild);
     }
-  })
+  });
 
   // populate the scores modal
   for (let i = 0; i < highScores.length; i++) {
-    let scoreEl = document.createElement('li')
+    let scoreEl = document.createElement('li');
     scoreEl.innerHTML =
       '<span>' +
       highScores[i].initials +
       '</span>' +
       '<span>' +
       highScores[i].score +
-      '</span>'
-    scoreListEl.appendChild(scoreEl)
+      '</span>';
+    scoreListEl.appendChild(scoreEl);
   }
 
   // show the scores modal
-  scoresModalEl.style.display = 'block'
+  scoresModalEl.style.display = 'block';
 }
 
 function toggleSound() {
-  soundEnabled = soundEnabled ? false : true
+  soundEnabled = soundEnabled ? false : true;
   if (soundEnabled) {
-    toggleSoundEl.textContent = 'Disable sound'
+    toggleSoundEl.textContent = 'Disable sound';
   } else {
-    toggleSoundEl.textContent = 'Enable sound'
+    toggleSoundEl.textContent = 'Enable sound';
   }
 }
 
@@ -375,4 +377,4 @@ const questions = [
     ],
     correctChoice: 'Value and data type',
   },
-]
+];
